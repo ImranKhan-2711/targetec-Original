@@ -1,0 +1,103 @@
+package com.tec.dao.impl;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.inject.Inject;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.stereotype.Repository;
+
+import com.tec.dao.AccountDetailDao;
+import com.tec.dao.NeuroGenericDAO;
+import com.tec.model.AccountDetail;
+import com.tec.model.ResourceMaster;
+import com.tec.template.Page;
+import com.tec.template.PaginationHelper;
+
+@Repository("accountDetailDao")
+public class AccountDetailDaoImpl extends NeuroGenericDAO implements AccountDetailDao {
+
+	public AccountDetailDaoImpl() {
+
+	}
+
+	@Inject
+	public AccountDetailDaoImpl(JdbcTemplate jdbcTemplate) {
+		super(jdbcTemplate);
+	}
+
+	public Page<AccountDetail> findStudents(Page<AccountDetail> page, String firstName, String lastName,
+			String mobileNumber) {
+
+		PaginationHelper<AccountDetail> ph = new PaginationHelper<AccountDetail>();
+
+		String selSQL = "SELECT acd.id,acd.first_name,acd.last_name,acd.email,acd.phone_number, rsm.resource_ext, rsm.resource_path FROM account_detail acd,account ac,resource_master rsm WHERE ac.role_id='STUDENT_ROLE' and ac.id=acd.account_id and acd.profile_image=rsm.id";
+
+		if (firstName != null && !firstName.equals("")) {
+			selSQL += " and acd.first_name like '%" + firstName + "%'";
+		}
+		if (lastName != null && !lastName.equals("")) {
+			selSQL += " and acd.last_name like '%" + lastName + "%'";
+		}
+		if (mobileNumber != null && !mobileNumber.equals("")) {
+			selSQL += " and acd.phone_number like '%" + mobileNumber + "%'";
+		}
+		System.out.println(jdbcTemplate + "jdbcTemplate\n\n\n");
+		String countSQL = "select count(*) from (" + selSQL + ") c";
+		return ph.fetchPage(jdbcTemplate, countSQL, selSQL, new String[] {}, page, new AccountDetailMapper());
+	}
+
+	public Page<AccountDetail> findTrainers(Page<AccountDetail> page, String firstName, String lastName,
+			String mobileNumber) {
+		PaginationHelper<AccountDetail> ph = new PaginationHelper<AccountDetail>();
+
+		String selSQL = "SELECT acd.id,acd.first_name,acd.last_name,acd.email,acd.phone_number, rsm.resource_ext, rsm.resource_path FROM account_detail acd,account ac WHERE ac.role_id='TRAINER_ROLE' and ac.id=acd.account_id and acd.profile_image=rsm.id";
+
+		if (firstName != null && !firstName.equals("")) {
+			selSQL += " and acd.first_name like '%" + firstName + "%'";
+		}
+		if (lastName != null && !lastName.equals("")) {
+			selSQL += " and acd.last_name like '%" + lastName + "%'";
+		}
+		if (mobileNumber != null && !mobileNumber.equals("")) {
+			selSQL += " and acd.phone_number like '%" + mobileNumber + "%'";
+		}
+		System.out.println(jdbcTemplate + "jdbcTemplate\n\n\n");
+		String countSQL = "select count(*) from (" + selSQL + ") c";
+		return ph.fetchPage(jdbcTemplate, countSQL, selSQL, new String[] {}, page, new AccountDetailMapper());
+
+	}
+
+	private static final class AccountDetailMapper implements ParameterizedRowMapper<AccountDetail> {
+
+		public AccountDetail mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+			return new AccountDetail(rs.getLong(1), null, rs.getString(2), rs.getString(3), rs.getString(4),
+					rs.getString(5), new ResourceMaster(null,null,rs.getString(6),rs.getString(7),null,null,null));
+		}
+	}
+
+	public AccountDetail findAccountDetailById(Long id) {
+		PaginationHelper<AccountDetail> ph = new PaginationHelper<AccountDetail>();
+		Page<AccountDetail> page=new Page<AccountDetail>("");
+		String selSQL="select acd.id,acd.first_name,acd.last_name,acd.email,acd.phone_number, rsm.resource_ext, rsm.resource_path from account_detail acd, resource_master rsm where acd.profile_image=rsm.id and acd.id=?";
+		String countSQL = "select count(*) from (" + selSQL + ") c";
+		return ph.fetchPage(jdbcTemplate, countSQL, selSQL, new Object[] {id}, page, new AccountDetailMapper()).getPageItems().get(0);
+	}
+
+	public AccountDetail insert(AccountDetail accountDetail) {
+		String insertSQL="INSERT into account_detail (account_id,first_name,last_name,email,phone_number,profile_image) VALUES (?,?,?,?,?,?)";
+		jdbcTemplate.update(insertSQL, new Object[]{accountDetail.getAccount().getId(),accountDetail.getFirstName(),accountDetail.getLastName(),accountDetail.getEmail(),accountDetail.getPhoneNumber(),accountDetail.getProfileImage().getId()});
+		accountDetail.setId(jdbcTemplate.queryForLong("select max(id) from account_detail"));
+		return accountDetail;
+	}
+
+	public AccountDetail update(AccountDetail accountDetail) {
+		String updateSQL="UPDATE account_detail SET first_name=?,last_name=?,email=?,phone_number=?,profile_image=? where id=?";
+		jdbcTemplate.update(updateSQL, new Object[]{accountDetail.getFirstName(),accountDetail.getLastName(),accountDetail.getEmail(),accountDetail.getPhoneNumber(),accountDetail.getProfileImage().getId(),accountDetail.getId()});
+		return accountDetail;
+	}
+
+}

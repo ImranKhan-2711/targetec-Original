@@ -1,0 +1,72 @@
+package com.tec.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.QuestionMasterDao;
+import com.tec.model.AnswerMaster;
+import com.tec.model.QuestionMaster;
+import com.tec.service.AnswerService;
+import com.tec.service.QuestionService;
+import com.tec.template.Page;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+@Service("questionService")
+public class QuestionServiceImpl implements QuestionService {
+
+	@Resource(name = "questionMasterDao")
+	private QuestionMasterDao questionMasterDao;
+
+	@Resource(name = "answerService")
+	protected AnswerService answerService;
+
+	public QuestionMaster findQuestionBean(Long id) {
+		QuestionMaster questionMaster = new QuestionMaster();
+		AnswerMaster answerMaster = new AnswerMaster();
+		List<AnswerMaster> answerMasters = new ArrayList<AnswerMaster>();
+		if (id != null) {
+			questionMaster = questionMasterDao.findByQuestionMasterId(id);
+			Page<AnswerMaster> page = new Page<AnswerMaster>(10, 1, -1, "", "asc");
+			Page<AnswerMaster> answerMasterPage = answerService.findAnswers(page,id);
+			System.out.println("row count  :>>>>>>"+answerMasterPage.getRowCount());
+			answerMasters = answerMasterPage.getPageItems();
+		} else {
+
+			questionMaster = new QuestionMaster(null, null, null, null, null, null, null, 50, 100, null, null);
+			answerMaster = new AnswerMaster(null, null, null, null, null);
+			answerMasters.add(answerMaster);
+		}
+		questionMaster.setAnswers(answerMasters);
+		return questionMaster;
+	}
+
+	public QuestionMaster updateQuestion(QuestionMaster questionMaster) {
+		if (questionMaster.getId() != null && !questionMaster.getId().equals("")) {
+			return null;
+		}
+		questionMaster.setId(questionMasterDao.insert(questionMaster));
+		List<AnswerMaster> answerMasters = questionMaster.getAnswers();
+		System.out.println(answerMasters.size());
+		for (AnswerMaster answerMaster : answerMasters) {
+			System.out.println(answerMaster.getAnswer());
+
+			answerMaster.setQuestionMaster(questionMaster);
+			answerService.updateAnswer(answerMaster);
+		}
+
+		return questionMaster;
+	}
+
+	public Page<QuestionMaster> listQuestions(Page<QuestionMaster> page, Long typeId) {
+		return questionMasterDao.findQuestions(page, typeId);
+	}
+
+}

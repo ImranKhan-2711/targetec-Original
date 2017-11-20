@@ -1,0 +1,19 @@
+package com.tec.tools;
+
+public interface IConstants {
+
+	public interface QuestionType {
+		public static final Long READING = 10000001l;
+		public static final Long WRITING = 10000002l;
+		public static final Long LISTENING = 10000003l;
+		public static final Long SPEAKING = 10000004l;
+	}
+
+	public interface QuestionStyle {
+		public static final Long MULTICHOICE = 10000001l;
+		public static final Long DRAGDROP = 10000002L;
+		public static final Long THREE = 10000003l;
+		public static final Long FOUR = 10000004L;
+		public static final Long FIVE = 10000005l;
+	}
+}

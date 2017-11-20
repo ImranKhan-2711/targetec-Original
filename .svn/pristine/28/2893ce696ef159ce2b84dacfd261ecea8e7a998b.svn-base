@@ -1,0 +1,13 @@
+package com.tec.service;
+
+import com.tec.model.AnswerMaster;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+public interface AnswerService {
+
+	public AnswerMaster updateAnswer(AnswerMaster answerMaster);
+}

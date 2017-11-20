@@ -1,0 +1,9 @@
+package com.tec.dao;
+
+import com.tec.model.StudentTest;
+
+public interface TestStudentMasterDao {
+
+	public StudentTest insert(StudentTest studentTest);
+
+}

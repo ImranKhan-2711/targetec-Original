@@ -1,0 +1,56 @@
+package com.tec.dao.impl;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.inject.Inject;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.stereotype.Repository;
+
+import com.tec.dao.AnswerMasterDao;
+import com.tec.dao.NeuroGenericDAO;
+import com.tec.model.AnswerMaster;
+import com.tec.template.Page;
+import com.tec.template.PaginationHelper;
+
+@Repository("answerMasterDao")
+public class AnswerMasterDaoImpl extends NeuroGenericDAO implements AnswerMasterDao {
+
+	public AnswerMasterDaoImpl() {
+
+	}
+
+	@Inject
+	public AnswerMasterDaoImpl(JdbcTemplate jdbcTemplate) {
+		super(jdbcTemplate);
+	}
+
+	public Long insert(AnswerMaster answerMaster) {
+		String insertSQL = "INSERT INTO answer_master (question_id,seq_no,answer,correct_y_n) VALUES (?,?,?,?)";
+		jdbcTemplate.update(insertSQL, new Object[] { answerMaster.getQuestionMaster().getId(), answerMaster.getSeqNo(),
+				answerMaster.getAnswer(), answerMaster.getCorrectYN() });
+		return jdbcTemplate.queryForLong("select max(id) from question_master");
+	}
+
+	public Page<AnswerMaster> findAnswers(Page<AnswerMaster> page, Long questionId) {
+		PaginationHelper<AnswerMaster> ph = new PaginationHelper<AnswerMaster>();
+
+		String selSQL = "SELECT am.id, am.seq_no, am.answer, am.correct_y_n FROM answer_master am WHERE 1=1 ";
+
+		if (questionId != null && !questionId.equals("")) {
+			selSQL += " and am.question_id = '" + questionId + "'";
+		}
+		String countSQL = "select count(*) from (" + selSQL + ") c";
+		return ph.fetchPage(jdbcTemplate, countSQL, selSQL, new String[] {}, page, new AnswerMasterMapper());
+	}
+
+	private static final class AnswerMasterMapper implements ParameterizedRowMapper<AnswerMaster> {
+
+		public AnswerMaster mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+			return new AnswerMaster(rs.getLong(1), null, rs.getString(2), rs.getString(3), rs.getString(4));
+		}
+	}
+}

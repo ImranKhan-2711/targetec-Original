@@ -1,0 +1,14 @@
+database.url=jdbc:mysql://192.168.0.101:8082/target_ec
+#database.username=root
+#database.password=password
+database.username=root
+database.password=root
+database.driver=com.mysql.jdbc.Driver
+server.resource.base=/home/harkomal/Projects/Neuron/resources/
+server.resource.url=http://localhost:8082/resources/images/
+
+
+mail.smtp.host=rsb39.rhostbh.com
+mail.smtp.username=notification@spinages.com
+mail.smtp.password=spinages123
+mail.smtp.port=587

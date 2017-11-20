@@ -1,0 +1,15 @@
+package com.tec.service;
+
+import com.tec.model.QuestionMaster;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+public interface QuestionService {
+
+	public QuestionMaster findQuestionBean(Long id);
+	
+	public QuestionMaster updateQuestion(QuestionMaster questionMaster);
+}

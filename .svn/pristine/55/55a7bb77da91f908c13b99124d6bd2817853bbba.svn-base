@@ -1,0 +1,44 @@
+package com.tec.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.AccountDao;
+import com.tec.dao.AnswerMasterDao;
+import com.tec.dao.QuestionMasterDao;
+import com.tec.model.AnswerMaster;
+import com.tec.model.QuestionMaster;
+import com.tec.service.AnswerService;
+import com.tec.service.QuestionService;
+import com.tec.template.Page;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+@Service("answerService")
+public class AnswerServiceImpl implements AnswerService {
+
+	@Resource(name = "answerMasterDao")
+	private AnswerMasterDao answerMasterDao;
+
+
+	public AnswerMaster updateAnswer(AnswerMaster answerMaster) {
+		if (answerMaster.getId() != null && !answerMaster.getId().equals("")) {
+			answerMaster = answerMasterDao.update(answerMaster);
+		}else{
+			answerMaster.setId(answerMasterDao.insert(answerMaster));
+		}
+		return answerMaster;
+	}
+
+	public Page<AnswerMaster> findAnswers(Page<AnswerMaster> page, Long questionId) {
+		return answerMasterDao.findAnswers(page, questionId);
+	}
+
+}

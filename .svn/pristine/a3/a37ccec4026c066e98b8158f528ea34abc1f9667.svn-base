@@ -1,0 +1,9 @@
+package com.tec.service;
+
+import com.tec.model.StudentTest;
+
+public interface TestStudentService {
+
+	public StudentTest insert(StudentTest studentTest);
+
+}

@@ -1,0 +1,12 @@
+package com.tec.service;
+
+import com.tec.model.AccountDetail;
+import com.tec.template.Page;
+
+public interface AccountService {
+	
+	public Page<AccountDetail> listStudents(Page<AccountDetail> page,String firstName,String lastName,String mobileNumber);
+	
+	public Page<AccountDetail> listTrainers(Page<AccountDetail> page,String firstName,String lastName,String mobileNumber);
+
+}

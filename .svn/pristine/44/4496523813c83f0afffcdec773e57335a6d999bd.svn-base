@@ -1,0 +1,9 @@
+package com.tec.dao;
+
+import com.tec.model.QuestionMaster;
+
+public interface QuestionMasterDao {
+
+	public Long insert(QuestionMaster questionMaster);
+
+}

@@ -1,0 +1,19 @@
+package com.tec.service;
+
+import com.tec.model.TestMaster;
+import com.tec.template.Page;
+
+public interface TestService {
+
+	public Page<TestMaster> listTest(Page<TestMaster> page, String testName, String description, String typeName,
+			String categoryName);
+
+	public TestMaster getTest(Long id);
+	
+	public TestMaster insert(TestMaster testMaster);
+	
+	public TestMaster update(TestMaster testMaster);
+	
+	public Page<TestMaster> listTestAssignToStudent(String userName,Page<TestMaster> page, String testName, String description, String typeName,
+			String categoryName);
+}

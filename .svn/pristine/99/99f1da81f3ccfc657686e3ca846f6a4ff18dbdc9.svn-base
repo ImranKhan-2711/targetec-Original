@@ -1,0 +1,144 @@
+package com.tec.controller;
+
+import java.security.Principal;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.Style;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.tec.model.AccountDetail;
+import com.tec.model.AnswerMaster;
+import com.tec.model.QuestionMaster;
+import com.tec.model.StyleMaster;
+import com.tec.model.TypeMaster;
+import com.tec.service.AccountService;
+import com.tec.service.QuestionService;
+import com.tec.template.Page;
+
+@Controller
+@RequestMapping({ "/admin" })
+@PropertySources(@PropertySource("classpath:com/tec/config/application.properties"))
+public class AdminController extends BaseController {
+
+	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+
+	@Resource(name = "accountService")
+	protected AccountService accountService;
+
+	@Resource(name = "questionService")
+	private QuestionService questionService;
+
+	@RequestMapping(value = "/dashboard")
+	public String home() {
+		return "admindashboard";
+	}
+
+	@RequestMapping(value = "/students")
+	public String listStudents(Principal currentUser, HttpServletRequest request, Model model) {
+		if (currentUser != null) {
+
+			// get page attributes
+			pageSize = request.getParameter("pageSize") == null ? 10
+					: Integer.parseInt(request.getParameter("pageSize"));
+			pageNumber = request.getParameter("pageNumber") == null ? 1
+					: Integer.parseInt(request.getParameter("pageNumber"));
+			sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+			sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+
+			// get search parameters
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
+			String mobileNumber = request.getParameter("mobileNumber");
+
+			Page<AccountDetail> page = new Page<AccountDetail>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+			model.addAttribute("students", accountService.listStudents(page, firstName, lastName, mobileNumber));
+			return "adminstudents";
+		} else {
+			return "login";
+		}
+	}
+
+	@RequestMapping(value = "/trainers")
+	public String listTrainers(Principal currentUser, HttpServletRequest request, Model model) {
+		if (currentUser != null) {
+			// get page attributes
+			pageSize = request.getParameter("pageSize") == null ? 10
+					: Integer.parseInt(request.getParameter("pageSize"));
+			pageNumber = request.getParameter("pageNumber") == null ? 1
+					: Integer.parseInt(request.getParameter("pageNumber"));
+			sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+			sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+
+			// get search parameters
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
+			String mobileNumber = request.getParameter("mobileNumber");
+
+			Page<AccountDetail> page = new Page<AccountDetail>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+			model.addAttribute("trainers", accountService.listTrainers(page, firstName, lastName, mobileNumber));
+			return "admintrainers";
+		} else {
+			return "login";
+		}
+	}
+
+	@RequestMapping(value = "/test")
+	public String createTest(Principal currentUser, HttpServletRequest request, Model model) {
+		model.addAttribute("question", questionService.findQuestionBean(null));
+		return "adminreadingtest";
+	}
+
+	@RequestMapping(value = "/form/test/update")
+	public String updateTestForm(Principal currentUser, HttpServletRequest request, Model model) {
+		QuestionMaster  questionMaster = new QuestionMaster();
+		TypeMaster typeMaster = new TypeMaster();
+		StyleMaster styleMaster = new StyleMaster();
+		List<AnswerMaster> list = new ArrayList<AnswerMaster>();
+		AnswerMaster answerMaster = new AnswerMaster();
+		String[] answers = request.getParameterValues("answer");
+		String[] correctYN = request.getParameterValues("correctYN");
+		String direction = request.getParameter("direction");
+		String question = request.getParameter("questionText");
+		String description = request.getParameter("description");
+		String duration = request.getParameter("duration");
+		for (int i = 0; i < answers.length; i++) {
+			for(int j = 0; j < correctYN.length; j++){
+				if(i==Integer.parseInt(correctYN[j])){
+					answerMaster.setCorrectYN("Y");
+					break;
+				}else{
+					answerMaster.setCorrectYN("N");
+				}
+			}
+			answerMaster.setAnswer(answers[i]);
+			list.add(answerMaster);
+		}
+		typeMaster.setId((long)10000001);
+		styleMaster.setId((long)10000001);
+		questionMaster.setAnswers(list);
+		questionMaster.setDirection(direction);
+		questionMaster.setQuestionText(question);
+		questionMaster.setStyleMaster(styleMaster);
+		questionMaster.setTypeMaster(typeMaster);
+		questionMaster.setDescription(description);
+		//questionMaster.setDuration(Time.valueOf(duration));
+		
+		QuestionMaster questionMasterBean = questionService.updateQuestion(questionMaster);
+		
+		model.addAttribute("question", questionMasterBean);
+		return "adminreadingtest";
+
+	}
+}

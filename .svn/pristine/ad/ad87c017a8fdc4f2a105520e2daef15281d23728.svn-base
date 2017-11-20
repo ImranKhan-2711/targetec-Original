@@ -1,0 +1,18 @@
+package com.tec.service;
+
+import com.tec.model.QuestionMaster;
+import com.tec.template.Page;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+public interface QuestionService {
+
+	public QuestionMaster findQuestionBean(Long id);
+	
+	public QuestionMaster updateQuestion(QuestionMaster questionMaster);
+	
+	public Page<QuestionMaster> listQuestions(Page<QuestionMaster> page,Long typeId);
+}

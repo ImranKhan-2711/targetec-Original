@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<definition name="studentdashboard" extends="studentdashboard">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/dashboard.jsp" />
+	</definition>
+
+	<definition name="studenttest" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/tlist.jsp" />
+	</definition>
+	<definition name="livetestquestiondtc" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/dragtocorrect.jsp" />
+	</definition>
+	<definition name="livetestquestiondd" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/dropdown.jsp" />
+	</definition>
+	<definition name="livetestquestionrmc" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/multichoicereading.jsp" />
+	</definition>
+	<definition name="livetestquestionrmcsingle" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/multichoicereadingsingle.jsp" />
+	</definition>
+	<definition name="livetestquestiondts" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/dragtosort.jsp" />
+	</definition>
+	<definition name="livetestquestionwrt" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/writing.jsp" />
+	</definition>
+	<definition name="livetestquestionlst" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/singletext.jsp" />
+	</definition>
+	<definition name="livetestquestionlmt" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/multitext.jsp" />
+	</definition>
+	<definition name="livetestquestionldt" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/differtransc.jsp" />
+	</definition>
+	<definition name="livetestquestionlmc" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/multichoicelestening.jsp" />
+	</definition>
+	<definition name="livetestquestionlmcsingle" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/multichoicelisteningsingle.jsp" />
+	</definition>
+	<definition name="livetestquestionspk" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/speaking.jsp" />
+	</definition>
+	<definition name="livetestquestionspk2" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/speakingdescribeimage.jsp" />
+	</definition>
+	<definition name="livetestquestionspk3" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/speakingrepeatsentence.jsp" />
+	</definition>
+	<definition name="studentprofile" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/profile/profile.jsp" />
+	</definition>
+	<definition name="studenttestdetail" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/ttestdetail.jsp" />
+	</definition>
+	<definition name="blockTestStudent" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/blockTest.jsp" />
+	</definition>
+	<definition name="livedetailrmc" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detailrmc.jsp" />
+	</definition>
+	<definition name="livedetailrmcsingle" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detailrmcsingle.jsp" />
+	</definition>
+	<definition name="livedetailrdc" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detailrdc.jsp" />
+	</definition>
+	<definition name="livedetailrds" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detailrds.jsp" />
+	</definition>
+	<definition name="livedetaillmt" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detaillmt.jsp" />
+	</definition>
+	<definition name="livedetaillst" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detaillst.jsp" />
+	</definition>
+	<definition name="livedetaillmc" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detaillmc.jsp" />
+	</definition>
+	<definition name="livedetaillmcsingle" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detaillmcsingle.jsp" />
+	</definition>
+		<definition name="livedetailwriting" extends="studentlayout">
+		<put-attribute name="content"
+			value="/WEB-INF/views/student/test/detail/detailwriting.jsp" />
+	</definition>
+</tiles-definitions>

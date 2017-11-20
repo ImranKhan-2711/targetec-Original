@@ -1,0 +1,77 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page session="false"%>
+<style>
+.div1 {
+	width: 160px;
+	height: 35px;
+	padding: 0px;
+	display: inline-flex;
+	border: 1px dotted #aaaaaa;
+}
+</style>
+<script>
+	function allowDrop(ev) {
+		ev.preventDefault();
+	}
+
+	function drag(ev) {
+		ev.dataTransfer.setData("text", ev.target.id);
+	}
+
+	function drop(ev) {
+		ev.preventDefault();
+		var data = ev.dataTransfer.getData("text");
+		ev.target.appendChild(document.getElementById(data));
+	}
+</script>
+<section class="content-header">
+	<h1>
+		Test <small>List</small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Accounts</a></li>
+		<li class="active">Test</li>
+	</ol>
+	<form action="processquest" method="post">
+	<input type="hidden" name="${_csrf.parameterName}"
+				value="${_csrf.token}" /> 
+	<input type="hidden" name="qId" value="${question.id}">	
+	<input type="hidden" name="cpq" value="${cpq}">		
+	<section class="content">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title">
+							<b>Directions:</b>&nbsp;
+						</h3>
+						${question.direction}
+					</div>
+					<!-- /.box-header -->
+					<div class="box-body">
+						<p>${question.questionText}</p>
+						<c:forEach items="${question.answers}" var="answer" varStatus="st">
+							<input id="drag${st.count}" name="answers"
+								class="btn btn-primary" type="text" value="${answer.answer}"
+								draggable="true" ondragstart="drag(event)">
+						</c:forEach>
+
+					</div>
+					<!-- /.box-body -->
+				</div>
+				<!-- /.box -->
+			</div>
+			<!-- /.col -->
+		</div>
+		<div class="row">
+			<div class="form-group col-md-4 col-lg-12">
+				<div class="pull-right btn_bx">
+					<button type="submit" class="btn btn-primary">Continue</button>
+				</div>
+			</div>
+		</div>
+	</section>
+	</form>
+	<!-- /.row -->
+</section>
+

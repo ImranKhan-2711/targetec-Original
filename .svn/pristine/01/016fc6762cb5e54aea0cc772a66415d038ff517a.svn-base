@@ -1,0 +1,429 @@
+package com.tec.controller;
+
+import java.security.Principal;
+import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.tec.model.Account;
+import com.tec.model.AccountDetail;
+import com.tec.model.AnswerMaster;
+import com.tec.model.AnswerOptions;
+import com.tec.model.QuestionMaster;
+import com.tec.model.ResourceMaster;
+import com.tec.model.StudentTest;
+import com.tec.model.StyleMaster;
+import com.tec.model.TestMaster;
+import com.tec.model.TestQuestion;
+import com.tec.model.TypeMaster;
+import com.tec.service.AccountService;
+import com.tec.service.QuestionService;
+import com.tec.service.TestQuestionService;
+import com.tec.service.TestService;
+import com.tec.service.TestStudentService;
+import com.tec.template.Page;
+import com.tec.tools.IConstants.QuestionStyle;
+import com.tec.tools.IConstants.QuestionType;
+
+@Controller
+@RequestMapping({ "/admin" })
+@PropertySources(@PropertySource("classpath:com/tec/config/application.properties"))
+public class AdminController extends BaseController {
+
+	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+
+	@Resource(name = "accountService")
+	protected AccountService accountService;
+
+	@Resource(name = "questionService")
+	private QuestionService questionService;
+
+	@Resource(name = "testService")
+	private TestService testService;
+
+	@Resource(name = "testQuestionService")
+	private TestQuestionService testQuestionService;
+	
+	@Resource(name = "testStudentService")
+	private TestStudentService testStudentService;
+
+	@RequestMapping(value = "/dashboard")
+	public String home() {
+		return "admindashboard";
+	}
+
+	@RequestMapping(value = "/students")
+	public String listStudents(Principal currentUser, HttpServletRequest request, Model model) {
+		if (currentUser != null) {
+
+			// get page attributes
+			pageSize = request.getParameter("pageSize") == null ? 10
+					: Integer.parseInt(request.getParameter("pageSize"));
+			pageNumber = request.getParameter("pageNumber") == null ? 1
+					: Integer.parseInt(request.getParameter("pageNumber"));
+			sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+			sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+
+			// get search parameters
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
+			String mobileNumber = request.getParameter("mobileNumber");
+
+			Page<AccountDetail> page = new Page<AccountDetail>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+			model.addAttribute("students", accountService.listStudents(page, firstName, lastName, mobileNumber));
+			model.addAttribute("pageNumber",pageNumber);
+			return "adminstudents";
+		} else {
+			return "login";
+		}
+	}
+
+	@RequestMapping(value = "/trainers")
+	public String listTrainers(Principal currentUser, HttpServletRequest request, Model model) {
+		if (currentUser != null) {
+			// get page attributes
+			pageSize = request.getParameter("pageSize") == null ? 10
+					: Integer.parseInt(request.getParameter("pageSize"));
+			pageNumber = request.getParameter("pageNumber") == null ? 1
+					: Integer.parseInt(request.getParameter("pageNumber"));
+			sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+			sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+
+			// get search parameters
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
+			String mobileNumber = request.getParameter("mobileNumber");
+
+			Page<AccountDetail> page = new Page<AccountDetail>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+			model.addAttribute("trainers", accountService.listTrainers(page, firstName, lastName, mobileNumber));
+			model.addAttribute("pageNumber",pageNumber);
+			return "admintrainers";
+		} else {
+			return "login";
+		}
+	}
+
+	@RequestMapping(value = "/testlist")
+	public String listTest(Principal currentUser, HttpServletRequest request, Model model) {
+		if (currentUser != null) {
+			// get page attributes
+			pageSize = request.getParameter("pageSize") == null ? 10
+					: Integer.parseInt(request.getParameter("pageSize"));
+			pageNumber = request.getParameter("pageNumber") == null ? 1
+					: Integer.parseInt(request.getParameter("pageNumber"));
+			sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+			sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+
+			// get search parameters
+			String testName = request.getParameter("testName");
+			String description = request.getParameter("description");
+			String typeName = request.getParameter("typeName");
+			String categoryName = request.getParameter("categoryName");
+
+			Page<TestMaster> page = new Page<TestMaster>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+			model.addAttribute("testlist", testService.listTest(page, testName, description, typeName, categoryName));
+			model.addAttribute("pageNumber",pageNumber);
+			return "admintest";
+		} else {
+			return "login";
+		}
+	}
+
+	@RequestMapping(value = "/questions")
+	public String questionList(Principal currentUser, HttpServletRequest request, Model model) {
+		String typeId = request.getParameter("typeId");
+		// get page attributes
+		pageSize = request.getParameter("pageSize") == null ? 10 : Integer.parseInt(request.getParameter("pageSize"));
+		pageNumber = request.getParameter("pageNumber") == null ? 1
+				: Integer.parseInt(request.getParameter("pageNumber"));
+		sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+		sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+
+		Page<QuestionMaster> page = new Page<QuestionMaster>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+		model.addAttribute("questions", questionService.listQuestions(page, Long.parseLong(typeId)));
+		model.addAttribute("pageNumber",pageNumber);
+		if (QuestionType.WRITING.equals(Long.parseLong(typeId))) {
+			return "adminwlist";
+		} else if (QuestionType.LISTENING.equals(Long.parseLong(typeId))) {
+			return "adminllist";
+		} else if (QuestionType.SPEAKING.equals(Long.parseLong(typeId))) {
+			return "adminslist";
+		} else {
+			return "adminrlist";
+		}
+
+	}
+
+	@RequestMapping(value = "/form/test/update")
+	public String updateTestForm(Principal currentUser, HttpServletRequest request, Model model) {
+		QuestionMaster questionMaster = new QuestionMaster();
+		TypeMaster typeMaster = new TypeMaster();
+		StyleMaster styleMaster = new StyleMaster();
+		List<AnswerMaster> list = new ArrayList<AnswerMaster>();
+		AnswerMaster answerMaster = null;
+		AnswerOptions answerOptions = null;
+		List<AnswerOptions> answerOptionsList = null;
+		String status = request.getParameter("status");
+		String resourceId = request.getParameter("resourceId");
+		String questionId = request.getParameter("questionId");
+		String styleId = request.getParameter("styleId");
+		String typeId = request.getParameter("typeId");
+		String[] answers = request.getParameterValues("answer");
+		String[] answerId = request.getParameterValues("answerId");
+		String[] opts = request.getParameterValues("opts");
+		String[] indx = request.getParameterValues("indx");
+		String[] correctYN = request.getParameterValues("correctYN");
+		String direction = request.getParameter("direction");
+		String question = request.getParameter("questionText");
+		String description = request.getParameter("description");
+		String duration = request.getParameter("duration");
+		String seqNo[] = request.getParameterValues("seqNo");
+		if (answers != null && !answers.equals("")) {
+			for (int i = 0; i < answers.length; i++) {
+				answerOptionsList = new ArrayList<AnswerOptions>();
+				answerMaster = new AnswerMaster();
+				if (QuestionStyle.MULTICHOICE.equals(Long.parseLong(styleId))
+						|| QuestionStyle.MULTICHOICE_L.equals(Long.parseLong(styleId))) {
+					if (correctYN != null && !correctYN.equals("")) {
+						for (int j = 0; j < correctYN.length; j++) {
+							if (i == Integer.parseInt(correctYN[j])) {
+								answerMaster.setCorrectYN("Y");
+								break;
+							} else {
+								answerMaster.setCorrectYN("N");
+							}
+						}
+					} else {
+						answerMaster.setCorrectYN("N");
+					}
+				} else if (QuestionStyle.DROPDOWN.equals(Long.parseLong(styleId))) {
+					for (int j = 0; j < opts.length; j++) {
+						if (i == Integer.parseInt(indx[j])) {
+							answerOptions = new AnswerOptions();
+							answerOptions.setAnsOption(opts[j]);
+							answerOptionsList.add(answerOptions);
+						}
+					}
+					answerMaster.setCorrectYN("N");
+				} else {
+					answerMaster.setCorrectYN("N");
+				}
+
+				if (answerId[i] != null && !answerId[i].equals("")) {
+					answerMaster.setId(Long.parseLong(answerId[i]));
+				}
+				answerMaster.setSeqNo(seqNo[i]);
+				answerMaster.setAnswer(answers[i]);
+				answerMaster.setOptions(answerOptionsList);
+				list.add(answerMaster);
+			}
+		}
+		if (questionId != null && !questionId.equals("")) {
+			questionMaster.setId(Long.parseLong(questionId));
+		}
+		typeMaster.setId(Long.parseLong(typeId));
+		styleMaster.setId(Long.parseLong(styleId));
+		questionMaster.setAnswers(list);
+		questionMaster.setDirection(direction);
+		questionMaster.setQuestionText(question);
+		questionMaster.setStyleMaster(styleMaster);
+		questionMaster.setTypeMaster(typeMaster);
+		questionMaster.setDescription(description);
+		if (status != null && !status.equals("")) {
+			questionMaster.setStatus(status);
+		}
+		if (resourceId != null && !resourceId.equals("")) {
+			questionMaster.setResourceMaster(new ResourceMaster(Long.parseLong(resourceId)));
+		}
+		//questionMaster.setDuration(Time.valueOf(duration));
+
+		QuestionMaster questionMasterBean = questionService.updateQuestion(questionMaster);
+
+		model.addAttribute("question", questionMasterBean);
+		if (QuestionStyle.SINGLETEXT.equals(Long.parseLong(styleId))) {
+			return "adminlisteningform1";
+		} else if (QuestionStyle.MULTICHOICE_L.equals(Long.parseLong(styleId))) {
+			return "adminlisteningform2";
+		} else if (QuestionStyle.MULTITEXT.equals(Long.parseLong(styleId))) {
+			return "adminlisteningform3";
+		} else if (QuestionStyle.DIFFERTRANSC.equals(Long.parseLong(styleId))) {
+			return "adminlisteningform4";
+		} else if (QuestionStyle.WRITING_STYLE.equals(Long.parseLong(styleId))) {
+			return "adminwritingform1";
+		} else if (QuestionStyle.SPEAKING_STYLE.equals(Long.parseLong(styleId))) {
+			return "adminspeakingform1";
+		} else if (QuestionStyle.DRAGTOCORRECT.equals(Long.parseLong(styleId))) {
+			return "adminreadingform2";
+		} else if (QuestionStyle.DRAGTOSORT.equals(Long.parseLong(styleId))) {
+			return "adminreadingform3";
+		} else if (QuestionStyle.DROPDOWN.equals(Long.parseLong(styleId))) {
+			return "adminreadingform4";
+		} else {
+			return "adminreadingform1";
+		}
+	}
+
+	@RequestMapping(value = "/reading/question/form/edit")
+	public String readQquestion(Principal currentUser, HttpServletRequest request, Model model) {
+		String styleId = request.getParameter("styleId");
+		String questionId = request.getParameter("questionId");
+		if (questionId == null || questionId == "") {
+			model.addAttribute("question", questionService.findQuestionBean(null));
+		} else {
+			model.addAttribute("question", questionService.findQuestionBean(Long.parseLong(questionId)));
+		}
+		if (QuestionStyle.DRAGTOCORRECT.equals(Long.parseLong(styleId))) {
+			return "adminreadingform2";
+		} else if (QuestionStyle.DRAGTOSORT.equals(Long.parseLong(styleId))) {
+			return "adminreadingform3";
+		} else if (QuestionStyle.DROPDOWN.equals(Long.parseLong(styleId))) {
+			return "adminreadingform4";
+		} else {
+			return "adminreadingform1";
+		}
+
+	}
+
+	@RequestMapping(value = "/listening/question/form/edit")
+	public String listenQuestion(Principal currentUser, HttpServletRequest request, Model model) {
+		String styleId = request.getParameter("styleId");
+		String questionId = request.getParameter("questionId");
+		if (questionId == null || questionId == "") {
+			model.addAttribute("question", questionService.findQuestionBean(null));
+		} else {
+			model.addAttribute("question", questionService.findQuestionBean(Long.parseLong(questionId)));
+		}
+		if (QuestionStyle.MULTICHOICE_L.equals(Long.parseLong(styleId))) {
+			return "adminlisteningform2";
+		} else if (QuestionStyle.MULTITEXT.equals(Long.parseLong(styleId))) {
+			return "adminlisteningform3";
+		} else if (QuestionStyle.DIFFERTRANSC.equals(Long.parseLong(styleId))) {
+			return "adminlisteningform4";
+		} else {
+			return "adminlisteningform1";
+		}
+	}
+
+	@RequestMapping(value = "/writing/question/form/edit")
+	public String writingQuestion(Principal currentUser, HttpServletRequest request, Model model) {
+		String styleId = request.getParameter("styleId");
+		String questionId = request.getParameter("questionId");
+		if (questionId == null || questionId == "") {
+			model.addAttribute("question", questionService.findQuestionBean(null));
+		} else {
+			model.addAttribute("question", questionService.findQuestionBean(Long.parseLong(questionId)));
+		}
+		return "adminwritingform1";
+	}
+
+	@RequestMapping(value = "/speaking/question/form/edit")
+	public String speakingQuestion(Principal currentUser, HttpServletRequest request, Model model) {
+		String styleId = request.getParameter("styleId");
+		String questionId = request.getParameter("questionId");
+		if (questionId == null || questionId == "") {
+			model.addAttribute("question", questionService.findQuestionBean(null));
+		} else {
+			model.addAttribute("question", questionService.findQuestionBean(Long.parseLong(questionId)));
+		}
+		return "adminspeakingform1";
+	}
+
+	@RequestMapping(value = "/form/test/question/edit")
+	public String testQuestion(Principal currentUser, HttpServletRequest request, Model model) {
+		String typeId = request.getParameter("typeId");
+		String testId = request.getParameter("testId");
+		pageSize = request.getParameter("pageSize") == null ? 10 : Integer.parseInt(request.getParameter("pageSize"));
+		pageNumber = request.getParameter("pageNumber") == null ? 1
+				: Integer.parseInt(request.getParameter("pageNumber"));
+		sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+		sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+
+		Page<QuestionMaster> page = new Page<QuestionMaster>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+
+		if (typeId != null && !typeId.equals("")) {
+			model.addAttribute("questions", questionService.listQuestions(page, Long.parseLong(typeId)));
+			model.addAttribute("test", testService.getTest(Long.parseLong(testId.toString())));
+			model.addAttribute("testquestion", testQuestionService.findList(Long.parseLong(testId.toString())));
+
+		}
+		return "admintestquestionform1";
+	}
+
+	@RequestMapping(value = "/form/test/question/update")
+	public String updateTestQuestionForm(Principal currentUser, HttpServletRequest request, Model model) {
+		TestMaster testMaster = null;
+		String[] correctYN = request.getParameterValues("correctYN");
+		String[] questionId = request.getParameterValues("questionId");
+		String testId = request.getParameter("testId");
+		TestQuestion testQuestion = null;
+		testQuestionService.delete(Long.parseLong(testId));
+		for (int i = 0; i < questionId.length; i++) {
+			for (int j = 0; j < correctYN.length; j++) {
+				if (i == Integer.parseInt(correctYN[j])) {
+					testQuestion = new TestQuestion();
+					testQuestion.setTestMaster(new TestMaster(Long.parseLong(testId)));
+					testQuestion.setQuestionMaster(new QuestionMaster(Long.parseLong(questionId[i])));
+					testQuestionService.insert(testQuestion);
+				}
+			}
+		}
+		testMaster = testService.getTest(Long.parseLong(testId));
+		testMaster.setQuestionCount(correctYN.length);
+		testService.update(testMaster);
+		String redirectUrl = "/admin/testlist";
+		return "redirect:" + redirectUrl;
+
+	}
+	
+	@RequestMapping(value = "/form/test/student/edit")
+	public String testStudent(Principal currentUser, HttpServletRequest request, Model model) {
+		String testId = request.getParameter("testId");
+		pageSize = request.getParameter("pageSize") == null ? 10 : Integer.parseInt(request.getParameter("pageSize"));
+		pageNumber = request.getParameter("pageNumber") == null ? 1
+				: Integer.parseInt(request.getParameter("pageNumber"));
+		sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+		sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+		// get search parameters
+	    String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String mobileNumber = request.getParameter("mobileNumber"); 
+					
+		Page<AccountDetail> page = new Page<AccountDetail>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+		model.addAttribute("test", testService.getTest(Long.parseLong(testId.toString())));
+		model.addAttribute("students", accountService.findStudentsfindStudentsWithoutTestId(page, firstName, lastName, mobileNumber, Long.parseLong(testId)));
+		
+		return "adminteststudentform1";
+	}
+	@RequestMapping(value = "/form/test/student/update")
+	public String updateTestStudentForm(Principal currentUser, HttpServletRequest request, Model model) {
+		String[] correctYN = request.getParameterValues("correctYN");
+		String[] studentId = request.getParameterValues("studentId");
+		String[] accountId = request.getParameterValues("accountId");
+		String testId = request.getParameter("testId");
+		StudentTest studentTest = null;
+		for (int i = 0; i < studentId.length; i++) {
+			for (int j = 0; j < correctYN.length; j++) {
+				if (i == Integer.parseInt(correctYN[j])) {
+					studentTest = new StudentTest();
+					studentTest.setTestMaster(new TestMaster(Long.parseLong(testId)));
+					studentTest.setAccount(new Account(Long.parseLong(accountId[i])));
+					testStudentService.insert(studentTest);
+				}
+			}
+		}
+		String redirectUrl = "/admin/testlist";
+		return "redirect:" + redirectUrl;
+
+	}
+}

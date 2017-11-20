@@ -1,0 +1,12 @@
+package com.tec.dao;
+
+import com.tec.model.AccountDetail;
+import com.tec.template.Page;
+
+public interface AccountDetailDao {
+	public Page<AccountDetail> findStudents(Page<AccountDetail> page, String firstName, String lastName,
+			String mobileNumber);
+
+	public Page<AccountDetail> findTrainers(Page<AccountDetail> page, String firstName, String lastName,
+			String mobileNumber);
+}

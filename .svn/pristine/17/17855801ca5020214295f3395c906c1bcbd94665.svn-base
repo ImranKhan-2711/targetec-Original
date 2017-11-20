@@ -1,0 +1,55 @@
+package com.tec.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.AccountDao;
+import com.tec.dao.AnswerMasterDao;
+import com.tec.dao.QuestionMasterDao;
+import com.tec.model.AnswerMaster;
+import com.tec.model.QuestionMaster;
+import com.tec.service.AnswerService;
+import com.tec.service.QuestionService;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+@Service("answerService")
+public class AnswerServiceImpl implements AnswerService {
+
+	@Resource(name = "answerMasterDao")
+	private AnswerMasterDao answerMasterDao; 
+	
+//	public QuestionMaster findQuestionBean(Long id) {
+//		QuestionMaster questionMaster = new QuestionMaster();
+//		List<AnswerMaster> answerMasters = new ArrayList<AnswerMaster>();
+//		if (id != null) {
+//
+//		} else {
+//
+//		}
+//		QuestionMaster questionMaster2 = new QuestionMaster((long) 100000002, null, null, null, "d", "e", "f", 50, 100,
+//				null, "active");
+//		AnswerMaster answerMaster = new AnswerMaster((long) 10000001, questionMaster2, "1", "hello baby", "Y");
+//		AnswerMaster answerMaster2 = new AnswerMaster((long) 10000002, questionMaster2, "2", "2nd question", "N");
+//		answerMasters.add(answerMaster);
+//		answerMasters.add(answerMaster2);
+//		questionMaster2.setAnswers(answerMasters);
+//		return questionMaster2;
+//	}
+
+	public AnswerMaster updateAnswer(AnswerMaster answerMaster) {
+		if(answerMaster.getId()!=null && !answerMaster.getId().equals("")){
+			return null;
+		}
+		Long answerMasterId = answerMasterDao.insert(answerMaster);
+		return answerMaster;
+	}
+
+}

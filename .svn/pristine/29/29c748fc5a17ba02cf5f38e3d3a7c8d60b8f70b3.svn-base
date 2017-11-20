@@ -1,0 +1,21 @@
+package com.tec.service.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.TestStudentMasterDao;
+import com.tec.model.StudentTest;
+import com.tec.service.TestStudentService;
+
+@Service("testStudentService")
+public class TestStudentServiceImpl implements TestStudentService {
+
+	@Resource(name = "testStudentMasterDao")
+	private TestStudentMasterDao testStudentMasterDao;
+
+	public StudentTest insert(StudentTest studentTest) {
+		return testStudentMasterDao.insert(studentTest);
+	}
+
+}

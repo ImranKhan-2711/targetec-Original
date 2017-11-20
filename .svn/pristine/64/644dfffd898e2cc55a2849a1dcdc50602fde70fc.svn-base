@@ -1,0 +1,61 @@
+package com.tec.controller;
+
+import java.security.Principal;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.tec.model.AccountDetail;
+import com.tec.service.AccountService;
+import com.tec.template.Page;
+
+
+@Controller
+@RequestMapping({ "/admin" })
+@PropertySources(@PropertySource("classpath:com/tec/config/application.properties"))
+public class AdminController extends BaseController{
+	
+	private static final Logger logger = LoggerFactory
+			.getLogger(AdminController.class);
+	
+	@Resource(name="accountService")
+	protected AccountService accountService; 
+
+	@RequestMapping(value = "/dashboard")
+	public String home() {
+		return "admindashboard";
+	}
+	
+	
+	@RequestMapping(value = "/students")
+	public String listStudents(Principal currentUser, HttpServletRequest request,Model model) {
+		if (currentUser != null) {
+			
+			//get page attributes
+			pageSize=request.getParameter("pageSize")==null?10:Integer.parseInt(request.getParameter("pageSize"));
+			pageNumber=request.getParameter("pageNumber")==null?1:Integer.parseInt(request.getParameter("pageNumber"));
+			sortIndex=request.getParameter("sortIndex")==null?"":request.getParameter("sortIndex");
+			sortOrder=request.getParameter("sortOrder")==null?"asc":request.getParameter("sortOrder");
+			
+			//get search parameters
+			String firstName=request.getParameter("firstName");
+			String lastName=request.getParameter("lastName");
+			String mobileNumber=request.getParameter("mobileNumber");
+			
+			Page<AccountDetail> page=new Page<AccountDetail>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+			model.addAttribute("students",accountService.listStudents(page, firstName, lastName, mobileNumber));			
+			return "adminstudents";
+		} else {
+			return "login";
+		}
+	}
+
+}

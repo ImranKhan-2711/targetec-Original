@@ -1,0 +1,92 @@
+package com.tec.model;
+
+public class ResourceMaster {
+	private Long id;
+	private String resourceType;
+	private String resourceExt;
+	private String resourcePath;
+	private String tableName;
+	private String columnName;
+	private String status;
+
+	@Override
+	public String toString() {
+		return "ResourceMaster []";
+	}
+	public ResourceMaster(Long id, String resourceType, String resourceExt, String resourcePath, String tableName,
+			String columnName, String status) {
+		super();
+		this.id = id;
+		this.resourceType = resourceType;
+		this.resourceExt = resourceExt;
+		this.resourcePath = resourcePath;
+		this.tableName = tableName;
+		this.columnName = columnName;
+		this.status = status;
+	}
+
+	public ResourceMaster() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public ResourceMaster(Long id){
+		super();
+		this.id=id;
+	}
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getResourceType() {
+		return resourceType;
+	}
+
+	public void setResourceType(String resourceType) {
+		this.resourceType = resourceType;
+	}
+
+	public String getResourceExt() {
+		return resourceExt;
+	}
+
+	public void setResourceExt(String resourceExt) {
+		this.resourceExt = resourceExt;
+	}
+
+	public String getResourcePath() {
+		return resourcePath;
+	}
+
+	public void setResourcePath(String resourcePath) {
+		this.resourcePath = resourcePath;
+	}
+
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
+	public String getColumnName() {
+		return columnName;
+	}
+
+	public void setColumnName(String columnName) {
+		this.columnName = columnName;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+}

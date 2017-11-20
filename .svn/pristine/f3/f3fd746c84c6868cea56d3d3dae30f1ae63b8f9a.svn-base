@@ -1,0 +1,129 @@
+/*
+ * Copyright 2011 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.tec.config;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+/**
+ * Main configuration class for the application. Turns on @Component scanning,
+ * loads externalized application.properties, and sets up the database.
+ * 
+ * @author Harkomal Singh
+ */
+
+@Configuration
+@ComponentScan({ "com.tec" })
+@PropertySource("classpath:com/tec/config/application.properties")
+@EnableTransactionManagement
+public class MainConfig {
+
+	@Bean
+	public static PropertyPlaceholderConfigurer properties() {
+		PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
+		Resource[] resources = new ClassPathResource[] { new ClassPathResource(
+				"com/tec/config/application.properties") };
+		ppc.setLocations(resources);
+		ppc.setIgnoreUnresolvablePlaceholders(true);
+		return ppc;
+	}
+
+	@Value("${database.url}")
+	private String databaseUrl;
+	@Value("${database.username}")
+	private String username;
+	@Value("${database.password}")
+	private String password;
+	@Value("${database.driver}")
+	private String driver;
+	
+	
+	@Value("${mail.smtp.host}")
+	private String smtpHost;
+	@Value("${mail.smtp.username}")
+	private String smtpUsername;
+	@Value("${mail.smtp.password}")
+	private String smtpPassword;
+	@Value("${mail.smtp.port}")
+	private Integer smtpPort;
+
+	@Bean
+	public DataSource dataSource() {
+
+		try {
+			Class.forName(driver);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		DriverManagerDataSource dataSource = new DriverManagerDataSource(
+				databaseUrl, username, password);
+		return dataSource;
+	}
+
+	@Bean
+	public PlatformTransactionManager transactionManager() {
+		return new DataSourceTransactionManager(dataSource());
+	}
+
+	@Bean
+	public JdbcTemplate jdbcTemplate() {
+		return new JdbcTemplate(dataSource());
+	}
+	
+	@Bean
+    public JavaMailSender javaMailSender() {
+        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+
+        javaMailSender.setHost(smtpHost);
+        javaMailSender.setUsername(smtpUsername);
+        javaMailSender.setPassword(smtpPassword);
+        javaMailSender.setPort(smtpPort);
+        
+        
+        javaMailSender.setJavaMailProperties(getMailProperties());
+
+        return javaMailSender;
+    }
+	
+	private Properties getMailProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("mail.transport.protocol", "smtp");
+        properties.setProperty("mail.smtp.auth", "true");
+        properties.setProperty("mail.smtp.starttls.enable", "true");
+        properties.setProperty("mail.debug", "true");
+        
+        
+        return properties;
+    }
+
+}

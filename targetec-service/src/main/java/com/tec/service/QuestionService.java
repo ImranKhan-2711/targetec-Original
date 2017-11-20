@@ -1,0 +1,29 @@
+package com.tec.service;
+
+import java.util.List;
+
+import com.tec.model.CategoryMaster;
+import com.tec.model.QuestionMaster;
+import com.tec.model.ResponseBean;
+import com.tec.model.TypeMaster;
+import com.tec.template.Page;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+public interface QuestionService {
+
+	public QuestionMaster findQuestionBean(Long id);
+	
+	public QuestionMaster updateQuestion(QuestionMaster questionMaster);
+	
+	public Page<QuestionMaster> listQuestions(Page<QuestionMaster> page,Long typeId);
+	
+	public List<TypeMaster> typeList();
+	
+	public List<CategoryMaster> categoryList();
+	
+	public ResponseBean delete(Long id);
+}

@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.tec</groupId>
+		<artifactId>targetec</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>targetec-service</artifactId>
+	<name>service module as service layer</name>
+	<description>service module as service layer</description>
+
+	<properties>
+		<java-version>1.7</java-version>
+		<org.springframework-version>4.0.0.RELEASE</org.springframework-version>
+		<org.aspectj-version>1.8.4</org.aspectj-version>
+		<org.springframework.security-version>4.0.0.RELEASE</org.springframework.security-version>
+		<org.slf4j-version>1.7.22</org.slf4j-version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+</project>

@@ -1,0 +1,40 @@
+package com.tec.service.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.TestMasterDao;
+import com.tec.model.TestMaster;
+import com.tec.service.TestService;
+import com.tec.template.Page;
+
+@Service("testService")
+public class TestServiceImpl implements TestService {
+
+	@Resource(name = "testMasterDao")
+	private TestMasterDao testMasterDao;
+
+	public Page<TestMaster> listTest(Page<TestMaster> page, String testName, String description, String typeName,
+			String categoryName) {
+		return testMasterDao.listTest(page, testName, description, typeName, categoryName);
+	}
+
+	public TestMaster getTest(Long id) {
+		return testMasterDao.getTest(id);
+	}
+
+	public TestMaster insert(TestMaster testMaster) {
+		return testMasterDao.insert(testMaster);
+	}
+
+	public TestMaster update(TestMaster testMaster) {
+		return testMasterDao.update(testMaster);
+	}
+
+	public Page<TestMaster> listTestAssignToStudent(String userName,Page<TestMaster> page, String testName, String description,
+			String typeName, String categoryName) {
+		return testMasterDao.listTestAssignToStudent(userName,page, testName, description, typeName, categoryName);
+	}
+
+}

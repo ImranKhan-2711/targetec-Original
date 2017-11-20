@@ -1,0 +1,16 @@
+package com.tec.service;
+
+import com.tec.model.AnswerMaster;
+import com.tec.template.Page;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+public interface AnswerService {
+
+	public AnswerMaster updateAnswer(AnswerMaster answerMaster);
+	
+	public  Page<AnswerMaster> findAnswers(Page<AnswerMaster> page, Long questionId) ;
+}

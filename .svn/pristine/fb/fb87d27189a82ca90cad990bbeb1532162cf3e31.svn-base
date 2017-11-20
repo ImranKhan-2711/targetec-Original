@@ -1,0 +1,75 @@
+package com.tec.service.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.AccountDao;
+import com.tec.dao.AccountDetailDao;
+import com.tec.model.Account;
+import com.tec.model.AccountDetail;
+import com.tec.model.RoleMaster;
+import com.tec.service.AccountService;
+import com.tec.template.Page;
+
+@Service("accountService")
+public class AccountServiceImpl implements AccountService {
+
+	@Resource(name = "accountDetailDao")
+	private AccountDetailDao accountDetailDao;
+
+	@Resource(name = "accountDao")
+	private AccountDao accountDao;
+
+	public Page<AccountDetail> listStudents(Page<AccountDetail> page, String firstName, String lastName,
+			String mobileNumber) {
+		return accountDetailDao.findStudents(page, firstName, lastName, mobileNumber);
+	}
+
+	public Page<AccountDetail> listTrainers(Page<AccountDetail> page, String firstName, String lastName,
+			String mobileNumber) {
+		return accountDetailDao.findTrainers(page, firstName, lastName, mobileNumber);
+	}
+
+	public AccountDetail getStudent(Long id) {
+		return accountDetailDao.findAccountDetailById(id);
+	}
+
+	public AccountDetail updateStudent(AccountDetail accountDetail) {
+		if (accountDetail.getId() != null && !accountDetail.getId().equals("")) {
+			accountDetailDao.update(accountDetail);
+			return accountDetail;
+		} else {
+			return accountDetailDao.insert(accountDetail);
+		}
+	}
+
+	public Account createStudent(Account account) {
+		account.setRole(new RoleMaster("STUDENT_ROLE", null, null));
+		return accountDao.insert(account);
+	}
+
+	public Account createTrainer(Account account) {
+		account.setRole(new RoleMaster("TRAINER_ROLE", null, null));
+		return accountDao.insert(account);
+	}
+
+	public AccountDetail updateTrainer(AccountDetail accountDetail) {
+		if (accountDetail.getId() != null && !accountDetail.getId().equals("")) {
+			accountDetailDao.update(accountDetail);
+			return accountDetail;
+		} else {
+			return accountDetailDao.insert(accountDetail);
+		}
+	}
+
+	public AccountDetail getTrainer(Long id) {
+		return accountDetailDao.findAccountDetailById(id);
+	}
+
+	public Account getAccountById(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

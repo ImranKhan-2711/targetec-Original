@@ -1,0 +1,77 @@
+package com.tec.controller;
+
+import java.security.Principal;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.tec.model.TestMaster;
+import com.tec.service.AccountService;
+import com.tec.service.QuestionService;
+import com.tec.service.TestQuestionService;
+import com.tec.service.TestService;
+import com.tec.service.TestStudentService;
+import com.tec.template.Page;
+
+@Controller
+@RequestMapping({ "/student" })
+@PropertySources(@PropertySource("classpath:com/tec/config/application.properties"))
+public class StudentController extends BaseController {
+
+	private static final Logger logger = LoggerFactory.getLogger(StudentController.class);
+
+	@Resource(name = "accountService")
+	protected AccountService accountService;
+
+	@Resource(name = "questionService")
+	private QuestionService questionService;
+
+	@Resource(name = "testService")
+	private TestService testService;
+
+	@Resource(name = "testQuestionService")
+	private TestQuestionService testQuestionService;
+	
+	@Resource(name = "testStudentService")
+	private TestStudentService testStudentService;
+
+	@RequestMapping(value = "/dashboard")
+	public String home(Principal currentUser, HttpServletRequest request, Model model) {
+		model.addAttribute("home", accountService.getAccountByUserName(currentUser.getName()));
+		return "studentdashboard";
+	}
+	
+	@RequestMapping(value = "/testlist")
+	public String listTest(Principal currentUser, HttpServletRequest request, Model model) {
+		if (currentUser != null) {
+			// get page attributes
+			pageSize = request.getParameter("pageSize") == null ? 10
+					: Integer.parseInt(request.getParameter("pageSize"));
+			pageNumber = request.getParameter("pageNumber") == null ? 1
+					: Integer.parseInt(request.getParameter("pageNumber"));
+			sortIndex = request.getParameter("sortIndex") == null ? "" : request.getParameter("sortIndex");
+			sortOrder = request.getParameter("sortOrder") == null ? "asc" : request.getParameter("sortOrder");
+
+			// get search parameters
+			String testName = request.getParameter("testName");
+			String description = request.getParameter("description");
+			String typeName = request.getParameter("typeName");
+			String categoryName = request.getParameter("categoryName");
+
+			Page<TestMaster> page = new Page<TestMaster>(pageNumber, pageSize, -1, sortIndex, sortOrder);
+			model.addAttribute("testlist", testService.listTestAssignToStudent(currentUser.getName(),page, testName, description, typeName, categoryName));
+			model.addAttribute("pageNumber",pageNumber);
+			return "studenttest";
+		} else {
+			return "login";
+		}
+	}
+}

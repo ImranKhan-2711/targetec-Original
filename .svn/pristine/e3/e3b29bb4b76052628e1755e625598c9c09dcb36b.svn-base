@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<definition name="admindashboard" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/dashboard.jsp" />
+	</definition>
+	<definition name="adminstudents" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/students.jsp" />
+	</definition>
+	<definition name="admintrainers" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/trainers.jsp" />
+	</definition>
+	<definition name="admintest" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/test/tlist.jsp" />
+	</definition>
+	<definition name="adminreadingform1" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/reading/form1.jsp" />
+	</definition>
+	<definition name="adminreadingform2" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/reading/form2.jsp" />
+	</definition>
+	<definition name="adminreadingform3" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/reading/form3.jsp" />
+	</definition>
+	<definition name="adminreadingform4" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/reading/form4.jsp" />
+	</definition>
+	<definition name="adminreadingform5" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/reading/form5.jsp" />
+	</definition>
+	<definition name="adminrlist" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/reading/rlist.jsp" />
+	</definition>
+	<definition name="adminwlist" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/writing/wlist.jsp" />
+	</definition>
+	<definition name="adminllist" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/listening/llist.jsp" />
+	</definition>
+	<definition name="adminslist" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/speaking/slist.jsp" />
+	</definition>
+	<definition name="adminspeakingform1" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/speaking/form1.jsp" />
+	</definition>
+	<definition name="adminlisteningform1" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/listening/form1.jsp" />
+	</definition>
+	<definition name="adminlisteningform2" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/listening/form2.jsp" />
+	</definition>
+	<definition name="adminlisteningform3" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/listening/form3.jsp" />
+	</definition>
+	<definition name="adminlisteningform4" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/listening/form4.jsp" />
+	</definition>
+		<definition name="adminwritingform1" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/questions/writing/form1.jsp" />
+	</definition>
+	<definition name="admintestquestionform1" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/test/testquestionlist.jsp" />
+	</definition>
+	<definition name="adminteststudentform1" extends="adminlayout">
+		<put-attribute name="content" value="/WEB-INF/views/admin/test/teststudentlist.jsp" />
+	</definition>
+</tiles-definitions>

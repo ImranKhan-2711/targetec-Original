@@ -1,0 +1,85 @@
+package com.tec.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.AnswerMasterDao;
+import com.tec.dao.QuestionMasterDao;
+import com.tec.dao.StudentTestAnswerDao;
+import com.tec.dao.StudentTestDetailDao;
+import com.tec.dao.TestStudentMasterDao;
+import com.tec.model.AnswerMaster;
+import com.tec.model.QuestionMaster;
+import com.tec.model.StudentTest;
+import com.tec.model.StudentTestAnswer;
+import com.tec.model.StudentTestDetail;
+import com.tec.service.TestStudentService;
+import com.tec.template.Page;
+
+@Service("testStudentService")
+public class TestStudentServiceImpl implements TestStudentService {
+
+	@Resource(name = "questionMasterDao")
+	private QuestionMasterDao questionMasterDao;
+	
+	@Resource(name = "testStudentMasterDao")
+	private TestStudentMasterDao testStudentMasterDao;
+	
+	@Resource(name = "studentTestDetailDao")
+	private StudentTestDetailDao studentTestDetailDao;
+	
+	@Resource(name = "studentTestAnswerDao")
+	private StudentTestAnswerDao studentTestAnswerDao;
+	
+	@Resource(name = "answerMasterDao")
+	private AnswerMasterDao answerMasterDao;
+
+	public StudentTest insert(StudentTest studentTest) {
+		return testStudentMasterDao.insert(studentTest);
+	}
+
+	public List<QuestionMaster> listTestQuestions(Long testId) {
+		return questionMasterDao.findQuestionsByTestId(testId);
+	}
+	
+	public StudentTestDetail insertTestDetail(StudentTestDetail studentTestDetail) {
+		return studentTestDetailDao.insert(studentTestDetail);
+	}
+	
+	public Boolean insertStudentAnswers(List<StudentTestAnswer> answers) {
+		return studentTestAnswerDao.insertAnswers(answers);
+	}
+
+	public List<StudentTestAnswer> getStudentAnswers(Long testDetailId,
+			Long questionId) {
+		return studentTestAnswerDao.listStudentAnswers(testDetailId, questionId);
+	}
+	
+	public StudentTestDetail processDragAndCorrect(StudentTestDetail studentTestDetail,
+			Long questionId) {
+		Page<AnswerMaster> page=new Page<AnswerMaster>("");
+ 		List<AnswerMaster> correctAnswers=answerMasterDao.findAnswers(page, questionId).getPageItems();
+ 		List<StudentTestAnswer> studentAnswers=getStudentAnswers(studentTestDetail.getId(), questionId);
+ 		int i=0;
+ 		for(AnswerMaster am:correctAnswers){
+ 			if(Integer.parseInt(am.getSeqNo())!=studentAnswers.get(i).getAnsSeqNo() || !am.getAnswer().equals(studentAnswers.get(i).getTextAnswer())){
+ 				studentTestDetail.setAttempted(studentTestDetail.getAttempted()+1);
+ 				studentTestDetail.setUncorrected(studentTestDetail.getUncorrected()+1);
+ 				return studentTestDetail;
+ 			}
+ 			++i;
+ 		}
+ 		studentTestDetail.setAttempted(studentTestDetail.getAttempted()+1);
+		studentTestDetail.setCorrected(studentTestDetail.getCorrected()+1);
+ 		return studentTestDetail;
+	}
+
+	public StudentTestDetail updateTestDetail(
+			StudentTestDetail studentTestDetail) {
+		return studentTestDetailDao.update(studentTestDetail);
+	}
+
+}

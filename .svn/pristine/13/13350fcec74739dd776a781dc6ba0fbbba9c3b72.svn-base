@@ -1,0 +1,93 @@
+package com.tec.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.QuestionMasterDao;
+import com.tec.model.AnswerMaster;
+import com.tec.model.AnswerOptions;
+import com.tec.model.QuestionMaster;
+import com.tec.service.AnswerOptionService;
+import com.tec.service.AnswerService;
+import com.tec.service.QuestionService;
+import com.tec.template.Page;
+
+/**
+ * 
+ * @author Mandeep
+ *
+ */
+@Service("questionService")
+public class QuestionServiceImpl implements QuestionService {
+
+	@Resource(name = "questionMasterDao")
+	private QuestionMasterDao questionMasterDao;
+
+	@Resource(name = "answerService")
+	protected AnswerService answerService;
+	
+	@Resource(name = "answerOptionService")
+	protected AnswerOptionService answerOptionService;
+
+	public QuestionMaster findQuestionBean(Long id) {
+		QuestionMaster questionMaster = new QuestionMaster();
+		AnswerMaster answerMaster = new AnswerMaster();
+		AnswerOptions answerOptions = new AnswerOptions();
+		AnswerOptions answerOptions2 = new AnswerOptions();
+		List<AnswerMaster> answerMasters = new ArrayList<AnswerMaster>();
+		List<AnswerOptions> answerOptionss = null;
+		Page<AnswerMaster> answerMasterPage =null;
+		Page<AnswerOptions> answerOptionsPage =null;
+		if (id != null) {
+			questionMaster = questionMasterDao.findByQuestionMasterId(id);
+			Page<AnswerMaster> page = new Page<AnswerMaster>(1, 10, -1, "", "asc");
+			answerMasterPage = answerService.findAnswers(page, id);
+			answerMasters = answerMasterPage.getPageItems();
+			for(AnswerMaster ans : answerMasters){
+				Page<AnswerOptions> page1 = new Page<AnswerOptions>(1, 10, -1, "", "asc");
+				answerOptionsPage = answerOptionService.findAnswerOptions(page1,ans.getId());
+				answerOptionss = new ArrayList<AnswerOptions>();
+				answerOptionss = answerOptionsPage.getPageItems();
+				ans.setOptions(answerOptionss);
+			}
+		} else {
+			answerOptionss = new ArrayList<AnswerOptions>();
+			questionMaster = new QuestionMaster(null, null, null, null, null, null, null, 50, 100, null, null);
+			answerMaster = new AnswerMaster(null, null, null, null, null);
+			answerOptions = new AnswerOptions(null, null, null);
+			answerOptionss.add(answerOptions);
+			answerMaster.setOptions(answerOptionss);
+			answerMasters.add(answerMaster);
+		}
+		questionMaster.setAnswers(answerMasters);
+		return questionMaster;
+	}
+
+	public QuestionMaster updateQuestion(QuestionMaster questionMaster) {
+		QuestionMaster questionMasterReturn = new QuestionMaster();
+		if (questionMaster.getId() != null && !questionMaster.getId().equals("")) {
+			questionMasterReturn = questionMasterDao.update(questionMaster);
+		}else{
+			questionMasterReturn = questionMasterDao.findByQuestionMasterId(questionMasterDao.insert(questionMaster));
+		}
+		
+		List<AnswerMaster> answerMasters = questionMaster.getAnswers();
+		for (AnswerMaster answerMaster : answerMasters) {
+			if (Integer.parseInt(answerMaster.getSeqNo()) > -1) {
+				answerMaster.setQuestionMaster(questionMasterReturn);
+				answerMaster = answerService.updateAnswer(answerMaster);
+			}
+		}
+		questionMasterReturn.setAnswers(answerMasters);
+		return questionMasterReturn;
+	}
+
+	public Page<QuestionMaster> listQuestions(Page<QuestionMaster> page, Long typeId) {
+		return questionMasterDao.findQuestions(page, typeId);
+	}
+
+}

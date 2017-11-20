@@ -1,0 +1,10 @@
+package com.tec.dao;
+
+import com.tec.model.Account;
+
+public interface AccountDao {
+
+	public Account insert(Account account);
+
+	public Account update(Account account);
+}

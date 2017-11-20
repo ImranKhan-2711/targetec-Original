@@ -1,0 +1,24 @@
+package com.tec.service.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.AccountDetailDao;
+import com.tec.model.AccountDetail;
+import com.tec.service.AccountService;
+import com.tec.template.Page;
+
+@Service("accountService")
+public class AccountServiceImpl implements AccountService{
+
+	@Resource(name="accountDetailDao")
+	private AccountDetailDao accountDetailDao;
+	public Page<AccountDetail> listStudents(Page<AccountDetail> page,
+			String firstName, String lastName, String mobileNumber) {
+		return accountDetailDao.findStudents(page, firstName, lastName, mobileNumber);
+	}
+
+
+	
+}

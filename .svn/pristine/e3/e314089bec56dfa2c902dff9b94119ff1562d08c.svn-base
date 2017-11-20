@@ -1,0 +1,233 @@
+package com.tec.controller;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.tec.model.Account;
+import com.tec.model.AnswerMaster;
+import com.tec.model.AnswerOptions;
+import com.tec.model.QuestionMaster;
+import com.tec.model.StudentTestAnswer;
+import com.tec.model.StudentTestDetail;
+import com.tec.model.TestMaster;
+import com.tec.service.AccountService;
+import com.tec.service.AnswerOptionService;
+import com.tec.service.AnswerService;
+import com.tec.service.QuestionService;
+import com.tec.service.TestQuestionService;
+import com.tec.service.TestService;
+import com.tec.service.TestStudentService;
+import com.tec.template.Page;
+
+@Controller
+@RequestMapping({ "/student" })
+@PropertySources(@PropertySource("classpath:com/tec/config/application.properties"))
+public class StudentController extends BaseController {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(StudentController.class);
+
+	@Resource(name = "accountService")
+	protected AccountService accountService;
+
+	@Resource(name = "questionService")
+	private QuestionService questionService;
+
+	@Resource(name = "testService")
+	private TestService testService;
+
+	@Resource(name = "testQuestionService")
+	private TestQuestionService testQuestionService;
+
+	@Resource(name = "testStudentService")
+	private TestStudentService testStudentService;
+
+	@Resource(name = "answerService")
+	private AnswerService answerService;
+	
+	@Resource(name = "answerOptionService")
+	private AnswerOptionService answerOptionService;
+
+	@RequestMapping(value = "/dashboard")
+	public String home(Principal currentUser, HttpServletRequest request,
+			Model model) {
+		model.addAttribute("home",
+				accountService.getAccountByUserName(currentUser.getName()));
+		return "studentdashboard";
+	}
+
+	@RequestMapping(value = "/testlist")
+	public String listTest(Principal currentUser, HttpServletRequest request,
+			Model model) {
+		if (currentUser != null) {
+			request.getSession().removeAttribute("questions");
+			// get page attributes
+			pageSize = request.getParameter("pageSize") == null ? 10 : Integer
+					.parseInt(request.getParameter("pageSize"));
+			pageNumber = request.getParameter("pageNumber") == null ? 1
+					: Integer.parseInt(request.getParameter("pageNumber"));
+			sortIndex = request.getParameter("sortIndex") == null ? ""
+					: request.getParameter("sortIndex");
+			sortOrder = request.getParameter("sortOrder") == null ? "asc"
+					: request.getParameter("sortOrder");
+
+			// get search parameters
+			String testName = request.getParameter("testName");
+			String description = request.getParameter("description");
+			String typeName = request.getParameter("typeName");
+			String categoryName = request.getParameter("categoryName");
+
+			Page<TestMaster> page = new Page<TestMaster>(pageNumber, pageSize,
+					-1, sortIndex, sortOrder);
+			model.addAttribute("testlist", testService.listTestAssignToStudent(
+					currentUser.getName(), page, testName, description,
+					typeName, categoryName));
+			model.addAttribute("pageNumber", pageNumber);
+			return "studenttest";
+		} else {
+			return "login";
+		}
+	}
+
+	@RequestMapping(value = "/livetest")
+	public String liveTest(Principal currentUser, HttpServletRequest request,
+			Model model) {
+		List<QuestionMaster> questions = null;
+		Integer lpq = null;
+		if (currentUser != null) {
+			if (request.getSession().getAttribute("questions") == null) {
+				if (request.getParameter("id") != null
+						&& !request.getParameter("id").equals("")) {
+					questions = testStudentService.listTestQuestions(Long
+							.parseLong(request.getParameter("id")));
+					request.getSession().setAttribute("questions", questions);
+					Account account = accountService.getAccount(currentUser
+							.getName());
+					StudentTestDetail detail = new StudentTestDetail();
+					detail.setAccount(account);
+					detail.setTestMaster(new TestMaster(Long.parseLong(request
+							.getParameter("id"))));
+					detail = testStudentService.insertTestDetail(detail);
+					request.getSession().setAttribute("testDetail", detail);
+				}
+			} else {
+				questions = (List<QuestionMaster>) request.getSession()
+						.getAttribute("questions");
+			}
+			if (request.getSession().getAttribute("lpq") == null) {
+				lpq = -1;
+			} else {
+				lpq = Integer.parseInt(request.getSession().getAttribute("lpq")
+						.toString());
+			}
+			
+			if(lpq+1==questions.size()){
+				return "redirect:testlist";
+			}
+			QuestionMaster question = questions.get(lpq + 1);
+
+			if (question.getStyleMaster().getName().equals("DRAGTOCORRECT")) {
+				Page<AnswerMaster> page = new Page<AnswerMaster>("");
+				question.setAnswers(answerService.findAnswers(page,
+						question.getId()).getPageItems());
+				String qt = question.getQuestionText();
+				String[] parts = qt.split("<b>");
+				for (int i = 1; i < parts.length; ++i) {
+					parts[i] = parts[i].substring(parts[i].indexOf("</b>") + 4);
+				}
+				String finalString = "";
+				for (int i = 1; i < parts.length; ++i) {
+					finalString += "<span class=\"div1\" ondrop=\"drop(event)\" ondragover=\"allowDrop(event)\"></span>"
+							+ parts[i];
+				}
+				finalString = "<p>" + parts[0] + finalString + "</p>";
+				System.out.println(finalString + "\n\n\n\n\n");
+				question.setQuestionText(finalString);
+				model.addAttribute("question", question);
+				model.addAttribute("cpq",lpq+1);
+				return "livetestquestiondtc";
+			}else if (question.getStyleMaster().getName().equals("DROPDOWN")){
+				Page<AnswerMaster> page = new Page<AnswerMaster>("");
+				List<AnswerMaster> answers=answerService.findAnswers(page,
+						question.getId()).getPageItems();
+				
+				Page<AnswerOptions> page1=null;
+				for(int i=0;i<answers.size();++i){
+					page1=new Page<AnswerOptions>("");
+					answers.get(i).setOptions(answerOptionService.findAnswerOptions(page1,answers.get(i).getId()).getPageItems());
+				}
+				question.setAnswers(answers);
+				String qt = question.getQuestionText();
+				String[] parts = qt.split("<b>");
+				for (int i = 1; i < parts.length; ++i) {
+					parts[i] = parts[i].substring(parts[i].indexOf("</b>") + 4);
+				}
+				String finalString = "";
+				for (int i = 1; i < parts.length; ++i) {
+					List<AnswerOptions> list=answers.get(i-1).getOptions();
+					String optionString="<option value=\"\"></option>";
+					for(AnswerOptions op:list){
+						optionString+="<option value=\""+op.getAnsOption()+"\">"+op.getAnsOption()+"</option>";
+					}
+					finalString += "<select name=\"answers\">"+optionString+"</select>"
+							+ parts[i];
+				}
+				finalString = "<p>" + parts[0] + finalString + "</p>";
+				System.out.println(finalString + "\n\n\n\n\n");
+				question.setQuestionText(finalString);
+				model.addAttribute("question", question);
+				model.addAttribute("cpq",lpq+1);
+				return "livetestquestiondd";
+			}
+			return "login";
+		} else {
+			return "login";
+		}
+	}
+
+	@RequestMapping(value = "/processquest")
+	public String processuest(Principal currentUser,
+			HttpServletRequest request, Model model) {
+		if (currentUser != null) {
+			StudentTestDetail detail = (StudentTestDetail) request.getSession()
+					.getAttribute("testDetail");
+			String questionId = request.getParameter("qId");
+			String cpq = request.getParameter("cpq");
+			String[] answers = request.getParameterValues("answers");
+			StudentTestAnswer answerDomain = null;
+			List<StudentTestAnswer> answersList = new ArrayList<StudentTestAnswer>();
+			int i=0;
+			for (String answer : answers) {
+				answerDomain = new StudentTestAnswer();
+				answerDomain.setAnsSeqNo(i);
+				answerDomain.setQuestionMaster(new QuestionMaster(Long
+						.parseLong(questionId)));
+				answerDomain.setStudentTestDetail(detail);
+				answerDomain.setTestMaster(detail.getTestMaster());
+				answerDomain.setTextAnswer(answer);
+				answersList.add(answerDomain);
+				++i;
+			}
+			testStudentService.insertStudentAnswers(answersList);
+			detail=testStudentService.processDragAndCorrect(detail, Long.parseLong(questionId));
+			testStudentService.updateTestDetail(detail);
+			request.getSession().setAttribute("lpq",cpq);
+			request.getSession().setAttribute("testDetail",detail);
+			return "redirect:livetest";
+		} else {
+			return "login";
+		}
+	}
+}

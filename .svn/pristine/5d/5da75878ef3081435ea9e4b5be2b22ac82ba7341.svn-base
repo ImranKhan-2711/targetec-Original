@@ -1,0 +1,13 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page session="false"%>
+<section class="content-header">
+	<h1>
+		Students <small>List</small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Accounts</a></li>
+		<li class="active">Students</li>
+	</ol>
+	<c:forEach items="${students.pageItems}" var="student">
+		${students.pageSize} ${students.pageNumber} ${student.phoneNumber}</c:forEach>
+</section>

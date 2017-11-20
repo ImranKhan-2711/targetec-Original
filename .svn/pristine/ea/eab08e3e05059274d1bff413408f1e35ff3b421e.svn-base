@@ -1,0 +1,7 @@
+package com.tec.service;
+
+public interface ResourceService {
+	
+	public Long updateStudentProfile(String fileName,String extension);
+
+}

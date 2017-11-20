@@ -1,0 +1,36 @@
+package com.tec.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.tec.dao.TestQuestionMasterDao;
+import com.tec.model.TestQuestion;
+import com.tec.service.TestQuestionService;
+
+@Service("testQuestionService")
+public class TestQuestionServiceImpl implements TestQuestionService {
+
+	@Resource(name = "testQuestionMasterDao")
+	private TestQuestionMasterDao testQuestionMasterDao;
+
+	public void delete(Long testMasterId) {
+		testQuestionMasterDao.delete(testMasterId);
+
+	}
+
+	public TestQuestion insert(TestQuestion testQuestion) {
+		return testQuestionMasterDao.insert(testQuestion);
+	}
+
+	public List<TestQuestion> findList(Long testId) {
+		return testQuestionMasterDao.findList(testId);
+	}
+
+	public int getTestQuestionByQuestionId(Long questionId) {
+		return testQuestionMasterDao.getTestQuestionByQuestionId(questionId);
+	}
+
+}
